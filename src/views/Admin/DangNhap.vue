@@ -9,7 +9,7 @@
       <v-img
         class="mx-auto my-6"
         max-width="150"
-        src="https://res.cloudinary.com/dgtjdhrnq/image/upload/v1705460127/logo1_adshdl.png"
+        src="@/assets/bg.jpg"
       ></v-img>
       <div class="text-h4 text-center" style="font-size: 32px">Đăng nhập</div>
       <div class="text-subtitle-1 text-medium-emphasis">Email</div>
@@ -44,7 +44,7 @@
           Quên mật khẩu?</a
         >
       </div>
-      <v-btn block class="mb-8" color="#0F60FF" size="large"> Đăng nhập </v-btn>
+      <v-btn block class="mb-8" background-color="black" size="large"> Đăng nhập </v-btn>
       <div class="text-center">
         Bạn chưa có tài khoản ?
         <a class="text-decoration-none text-center" style="color: #0f60ff">

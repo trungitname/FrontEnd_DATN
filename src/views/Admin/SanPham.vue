@@ -38,12 +38,12 @@
                   <td>{{ product.categoryid }}</td>
                   <td>{{ product.description }}</td>
                   <td>{{ product.quantity }}</td>
-                  <td>{{ product.color }}</td>
-                  <td>{{ product.size }}</td>
+                  <td>{{ product.color.join(', ')  }}</td>
+                  <td>{{ product.size.join(', ')  }}</td>
                   <td> <img v-bind:src="product.imageurl" alt="Product Image" class="product-image"/> </td>
 
                   <td class="text-center">
-                    <v-btn variant="text"><v-icon>mdi mdi-pencil-outline</v-icon></v-btn>
+                    <v-btn variant="text" @click="openEditDialog(product)"><v-icon>mdi mdi-pencil-outline</v-icon></v-btn>
                     <v-btn variant="text" @click="deleteProduct(product.productid)"><v-icon>mdi mdi-trash-can-outline</v-icon></v-btn>
                   </td>
                 </tr>
@@ -67,45 +67,89 @@
         </v-col>
       </v-row>
     </v-container>
-    <DialogVue v-model="dialog" />
+    <DialogVue v-model="dialog" @productAdded="fetchProducts"/>
+    <DialogEditView v-if="dialogEdit" v-model="dialogEdit" :selectedProduct="selectedProduct" @productEdited="fetchProducts"/>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import DialogVue from "../../components/Dialog.vue";
+import DialogVue from "../../components/Admin/Products/Dialog.vue";
+import DialogEditView from "../../components/Admin/Products/DialogEdit.vue";
 export default {
+  components: { DialogVue, DialogEditView },
+  name: "SanPhamView",
   data() {
     return {
-      dialog: false,
+      dialog: false, 
+      dialogEdit: false, 
       products: [],
+      selectedProduct: null,
     };
-  },
-  async created() {
-    const result = await axios.get('/api/products');
-    const products = result.data.map(product => {
-    console.log(product.imageurl); // Kiểm tra URL của hình ảnh
-    return {
-      ...product,
-      imageurl: product.imageurl
-    };
-  });
-  this.products = products;
   },
   methods: {
+    openEditDialog(product) {
+      this.selectedProduct = product; // Lưu sản phẩm cần chỉnh sửa vào selectedProduct
+      this.dialogEdit = true; // Mở dialog chỉnh sửa
+    },
     async deleteProduct(productId) {
       try {
         await axios.delete(`/api/products/${productId}`);
         // Sau khi xoá thành công, cập nhật danh sách sản phẩm
-        const result = await axios.get('/api/products');
-        this.products = result.data;
+        this.fetchProducts();
       } catch (error) {
         console.error('Error deleting product:', error);
       }
-    }
+    },
+    async fetchProducts() {
+      try {
+        const result = await axios.get('/api/products');
+        const products = result.data.map(product => {
+          console.log(product.imageurl); // Kiểm tra URL của hình ảnh
+          return {
+            ...product,
+            imageurl: product.imageurl
+          };
+        });
+        this.products = products;
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    },
   },
-  components: { DialogVue },
-  name: "SanPhamView",
+  async created() {
+    this.fetchProducts();
+  },
+  // data() {
+  //   return {
+  //     dialog: false,
+  //     products: [],
+  //   };
+  // },
+  // async created() {
+  //   const result = await axios.get('/api/products');
+  //   const products = result.data.map(product => {
+  //   console.log(product.imageurl); // Kiểm tra URL của hình ảnh
+  //   return {
+  //     ...product,
+  //     imageurl: product.imageurl
+  //   };
+  // });
+  // this.products = products;
+  // },
+  // methods: {
+  //   async deleteProduct(productId) {
+  //     try {
+  //       await axios.delete(`/api/products/${productId}`);
+  //       // Sau khi xoá thành công, cập nhật danh sách sản phẩm
+  //       const result = await axios.get('/api/products');
+  //       this.products = result.data;
+  //     } catch (error) {
+  //       console.error('Error deleting product:', error);
+  //     }
+  //   }
+  // },
+  
 };
 </script>
 
